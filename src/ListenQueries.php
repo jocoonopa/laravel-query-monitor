@@ -1,12 +1,15 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jocoonopa\LaravelQueryMonitor;
 
 use Closure;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use React\EventLoop\Factory;
-use React\Socket\Server;
 use React\Socket\ConnectionInterface;
+use React\Socket\Server;
 
 class ListenQueries
 {
@@ -21,11 +24,21 @@ class ListenQueries
     private $warn;
 
     /**
+     * @var Closure
+     */
+    private $comment;
+
+    /**
+     * @var Closure
+     */
+    private $line;
+
+    /**
      * @var boolean
      */
     private $debug = false;
 
-    function __construct(string $host, int $port, int $moreThanMiliseconds)
+    function __construct(string $host, $port, $moreThanMiliseconds)
     {
         $this->host = $host;
         $this->port = $port;
@@ -44,6 +57,16 @@ class ListenQueries
         $this->warn = $warn;
     }
 
+    public function setComment(Closure $comment)
+    {
+        $this->comment = $comment;
+    }
+
+    public function setLine(Closure $line)
+    {
+        $this->line = $line;
+    }
+
     public function setDebug(bool $debug)
     {
         $this->debug = $debug;
@@ -54,38 +77,36 @@ class ListenQueries
         call_user_func($this->info, 'Listen SQL queries on '.$this->host.':'.$this->port . PHP_EOL . PHP_EOL);
 
         $this->socket->on('connection', function (ConnectionInterface $connection) {
-
             $connection->on('data', function ($data) use ($connection) {
-
-                if($this->debug)
+                if ($this->debug) {
                     call_user_func($this->warn, '# Debug:' . $data);
+                }
 
                 $query = json_decode($data, true);
 
-
-                if ($query === null) {
-                    call_user_func($this->warn, '# Something wrong happened with JSON data received: ');
-
-                    call_user_func($this->info, $data);
+                if (is_null($query) || ! Arr::accessible($query)) {
+                    call_user_func($this->line, $data);
                 } else {
+                    $sql = Arr::get($query, 'sql');
+                    $time = Arr::get($query, 'time', 0);
+
                     if (
-                        $query['time'] > $this->moreThanMiliseconds &&
-                        ! $this->shouldIgnore($query['sql'])
+                        $time > $this->moreThanMiliseconds &&
+                        ! $this->shouldIgnore($sql)
                     ) {
 
-                        call_user_func($this->warn, '# Query received:');
+                        call_user_func($this->comment, "# Query received:\n");
 
-                        $bindings = $query['bindings'] ?? [];
+                        $bindings = Arr::get($query, 'bindings', []);
 
                         $normalizedBindings = array_map(function($i){
                             return is_string($i) ? '"'.$i.'"' : $i;
                         }, $bindings);
 
-                        $sql = Str::replaceArray('?', $normalizedBindings, $query['sql']);
+                        $sql = Str::replaceArray('?', $normalizedBindings, $sql);
 
-                        call_user_func($this->info, '# SQL: ' . $sql);
-                        call_user_func($this->info, '# Miliseconds: ' . $query['time']);
-                        call_user_func($this->info, '# Seconds: ' . $query['time'] / 1000);
+                        call_user_func($this->info, SqlFormatter::format($sql) . "\n");
+                        call_user_func($this->info, '# Seconds: ' . $time / 1000);
                         call_user_func($this->info, PHP_EOL);
                     }
                 }

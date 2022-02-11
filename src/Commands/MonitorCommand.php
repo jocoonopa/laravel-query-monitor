@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace Jocoonopa\LaravelQueryMonitor\Commands;
 
 use Illuminate\Console\Command;
@@ -51,6 +53,14 @@ class MonitorCommand extends Command
 
         $listenQueries->setWarn(function($message){
             $this->warn($message);
+        });
+
+        $listenQueries->setComment(function($message){
+            $this->comment($message);
+        });
+
+        $listenQueries->setLine(function($message){
+            $this->line($message);
         });
 
         $listenQueries->setDebug($debug);
