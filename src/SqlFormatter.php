@@ -944,7 +944,7 @@ class SqlFormatter
     protected static function highlightReservedWord($value)
     {
         if (self::is_cli()) {
-            return self::$cli_reserved . $value . "\x1b[0m";
+            return self::$cli_reserved . strtoupper($value) . "\x1b[0m";
         } else {
             return '<span ' . self::$reserved_attributes . '>' . $value . '</span>';
         }
