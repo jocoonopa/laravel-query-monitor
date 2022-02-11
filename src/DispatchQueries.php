@@ -43,7 +43,7 @@ class DispatchQueries
             ->then(function (ConnectionInterface $connection) use ($mixed) {
                 $mixed = is_string($mixed) ? $mixed : json_encode($mixed);
 
-                $connection->write(json_encode($mixed));
+                $connection->write($mixed);
             });
 
         $this->loop->run();
