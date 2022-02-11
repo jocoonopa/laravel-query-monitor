@@ -1,9 +1,9 @@
 <?php
 
-namespace Supliu\LaravelQueryMonitor\Commands;
+namespace Jocoonopa\LaravelQueryMonitor\Commands;
 
 use Illuminate\Console\Command;
-use Supliu\LaravelQueryMonitor\ListenQueries;
+use Jocoonopa\LaravelQueryMonitor\ListenQueries;
 
 class MonitorCommand extends Command
 {
@@ -44,7 +44,7 @@ class MonitorCommand extends Command
         $moreThanMiliseconds = $this->option('moreThanMiliseconds') ?? 0;
 
         $listenQueries = new ListenQueries($host, $port, $moreThanMiliseconds);
-        
+
         $listenQueries->setInfo(function($message){
             $this->info($message);
         });

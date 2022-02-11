@@ -1,6 +1,6 @@
 <?php declare(strict_types=1);
 
-namespace Supliu\LaravelQueryMonitor;
+namespace Jocoonopa\LaravelQueryMonitor;
 
 use React\EventLoop\Factory;
 use React\Socket\ConnectionInterface;
@@ -22,7 +22,7 @@ class DispatchQueries
      * @var \React\EventLoop\LoopInterface
      */
     private $loop;
-    
+
     /**
      * @var Connector
      */
@@ -36,14 +36,16 @@ class DispatchQueries
         $this->connector = new Connector($this->loop);
     }
 
-    public function send($query): void
+    public function send($mixed): void
     {
         $this->connector
             ->connect($this->host . ':' . $this->port)
-            ->then(function (ConnectionInterface $connection) use ($query) {
-                $connection->write(json_encode($query));
+            ->then(function (ConnectionInterface $connection) use ($mixed) {
+                $mixed = is_string($mixed) ? $mixed : json_encode($mixed);
+
+                $connection->write(json_encode($mixed));
             });
-        
+
         $this->loop->run();
     }
 }

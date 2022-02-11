@@ -2,13 +2,13 @@
 
 use Illuminate\Support\Facades\DB;
 use Orchestra\Testbench\TestCase;
-use Supliu\LaravelQueryMonitor\ListenQueries;
+use Jocoonopa\LaravelQueryMonitor\ListenQueries;
 
 class LaravelQueryMonitorTest extends TestCase
 {
     protected function getPackageProviders($app)
     {
-        return [\Supliu\LaravelQueryMonitor\ServiceProvider::class];
+        return [\Jocoonopa\LaravelQueryMonitor\ServiceProvider::class];
     }
 
     /**
@@ -24,8 +24,8 @@ class LaravelQueryMonitorTest extends TestCase
         $app['config']->set('laravel-query-monitor.port', 8082);
     }
 
-    /** 
-     * @test 
+    /**
+     * @test
      */
     public function runCommand()
     {

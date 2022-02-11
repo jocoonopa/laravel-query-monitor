@@ -1,6 +1,6 @@
 <?php
 
-namespace Supliu\LaravelQueryMonitor;
+namespace Jocoonopa\LaravelQueryMonitor;
 
 use Closure;
 use Illuminate\Support\Str;
@@ -56,7 +56,7 @@ class ListenQueries
         $this->socket->on('connection', function (ConnectionInterface $connection) {
 
             $connection->on('data', function ($data) use ($connection) {
-                
+
                 if($this->debug)
                     call_user_func($this->warn, '# Debug:' . $data);
 
@@ -65,17 +65,20 @@ class ListenQueries
 
                 if ($query === null) {
                     call_user_func($this->warn, '# Something wrong happened with JSON data received: ');
+
                     call_user_func($this->info, $data);
                 } else {
-
-                    if($query['time'] > $this->moreThanMiliseconds) {
+                    if (
+                        $query['time'] > $this->moreThanMiliseconds &&
+                        ! $this->shouldIgnore($query['sql'])
+                    ) {
 
                         call_user_func($this->warn, '# Query received:');
 
                         $bindings = $query['bindings'] ?? [];
 
-                        $normalizedBindings = array_map(function($i){ 
-                            return is_string($i) ? '"'.$i.'"' : $i; 
+                        $normalizedBindings = array_map(function($i){
+                            return is_string($i) ? '"'.$i.'"' : $i;
                         }, $bindings);
 
                         $sql = Str::replaceArray('?', $normalizedBindings, $query['sql']);
@@ -85,15 +88,19 @@ class ListenQueries
                         call_user_func($this->info, '# Seconds: ' . $query['time'] / 1000);
                         call_user_func($this->info, PHP_EOL);
                     }
-
                 }
 
-
                 $connection->close();
-                
             });
         });
 
         $this->loop->run();
+    }
+
+    protected function shouldIgnore($sql): bool
+    {
+        $ignoreWords = explode(',', config('laravel-query-monitor.ignore_words'));
+
+        return Str::contains($sql, $ignoreWords ?? 'information_schema.tables');
     }
 }

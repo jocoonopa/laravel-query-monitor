@@ -4,7 +4,7 @@
 ![Packagist Version](https://img.shields.io/packagist/v/supliu/laravel-query-monitor)
 ![PHP version from Travis config](https://img.shields.io/travis/php-v/supliu/laravel-query-monitor/master)
 
-<a href="https://supliu.com.br">Supliu</a> Laravel Query Monitor is library to monitoring Queries in real-time using Laravel Artisan Command. Basically it opens a socket listening and displays (on terminal) the queries executed in your Laravel application.
+<a href="https://supliu.com.br">Jocoonopa</a> Laravel Query Monitor is library to monitoring Queries in real-time using Laravel Artisan Command. Basically it opens a socket listening and displays (on terminal) the queries executed in your Laravel application.
 
 <p align="center">
   <img src="demo.gif" width="100%">
@@ -22,7 +22,7 @@ composer require --dev supliu/laravel-query-monitor
 2) Run publish command
 
 ```ssh
-php artisan vendor:publish --provider="Supliu\LaravelQueryMonitor\ServiceProvider"
+php artisan vendor:publish --provider="Jocoonopa\LaravelQueryMonitor\ServiceProvider"
 ```
 
 ## How to use

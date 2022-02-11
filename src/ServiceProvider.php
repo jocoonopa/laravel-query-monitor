@@ -1,10 +1,10 @@
 <?php
 
-namespace Supliu\LaravelQueryMonitor;
+namespace Jocoonopa\LaravelQueryMonitor;
 
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\ServiceProvider as BaseServiceProvider;
-use Supliu\LaravelQueryMonitor\Commands\MonitorCommand;
+use Jocoonopa\LaravelQueryMonitor\Commands\MonitorCommand;
 
 class ServiceProvider extends BaseServiceProvider
 {
