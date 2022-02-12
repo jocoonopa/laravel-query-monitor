@@ -29,7 +29,7 @@ class ServiceProvider extends BaseServiceProvider
         $port = config('laravel-query-monitor.port');
         $enable = config('laravel-query-monitor.enable');
 
-        if ($host && $port && $enable && && ! app()->isProduction()) {
+        if ($host && $port && $enable && ! app()->isProduction()) {
             $dispatchQueries = new DispatchQueries($host, (int) $port);
 
             DB::listen(function ($query) use ($dispatchQueries) {
