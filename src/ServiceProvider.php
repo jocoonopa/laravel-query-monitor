@@ -25,14 +25,11 @@ class ServiceProvider extends BaseServiceProvider
             __DIR__.'/../config/laravel-query-monitor.php' => config_path('laravel-query-monitor.php'),
         ]);
 
-        /*
-         * Setting
-         */
         $host = config('laravel-query-monitor.host');
         $port = config('laravel-query-monitor.port');
         $enable = config('laravel-query-monitor.enable');
 
-        if ($host && $port && $enable) {
+        if ($host && $port && $enable && && ! app()->isProduction()) {
             $dispatchQueries = new DispatchQueries($host, (int) $port);
 
             DB::listen(function ($query) use ($dispatchQueries) {
